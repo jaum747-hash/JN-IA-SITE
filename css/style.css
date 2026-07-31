@@ -1,0 +1,1305 @@
+/* ===========================================================
+   JN IA — Criação de sites e presença digital
+   Sistema visual: "chapa usinada"
+
+   Prata não é cor de acento, é material: tem espessura, aresta
+   e uma fonte de luz única pra página inteira. Seções são
+   painéis rebaixados ou elevados. Numeração é gravação.
+
+   Paleta de marca: cinza escuro (base) | branco (conteúdo) | prata (material)
+   Display: Bricolage Grotesque · Mono: JetBrains Mono · Corpo: Inter
+   =========================================================== */
+
+/* ===========================================================
+   01 / TOKENS
+   Toda cor, medida, tempo e curva nasce aqui. Zero valor solto.
+   =========================================================== */
+:root {
+  /* --- Superfície: 4 profundidades de chapa --- */
+  --co-void:   #08090a;   /* rebaixo, o plano mais fundo */
+  --co-base:   #101215;   /* base de marca */
+  --co-panel:  #16191d;   /* painel elevado */
+  --co-edge:   #1f2429;   /* painel com aresta iluminada */
+
+  /* --- Conteúdo --- */
+  --co-ink:    #fafcff;   /* títulos */
+  --co-body:   #c3c9d1;   /* parágrafos */
+  --co-label:  #8a9199;   /* rótulos mono */
+
+  /* --- Prata: o material --- */
+  --co-silver: #d7dce2;
+  --co-spec:   #ffffff;   /* especular */
+  --co-shade:  #8b9198;   /* sombra do metal */
+
+  /* --- Arestas --- */
+  --li-fina:   rgba(255, 255, 255, 0.09);
+  --li-media:  rgba(255, 255, 255, 0.16);
+  --li-prata:  rgba(215, 220, 226, 0.42);
+  --li-luz:    rgba(255, 255, 255, 0.14);   /* quina superior de painel elevado */
+
+  /* --- A fonte de luz.
+         O scroll move --luz. Todo elemento prata da página lê
+         a mesma posição, então a página inteira é uma superfície só. --- */
+  --luz: 42%;
+
+  --metal: linear-gradient(148deg,
+    #8e959d 0%,
+    #c8cfd6 calc(var(--luz) - 22%),
+    #ffffff calc(var(--luz) - 4%),
+    #eaeff4 calc(var(--luz) + 7%),
+    #a7aeb6 calc(var(--luz) + 28%),
+    #d2d8de 100%);
+
+  /* Metal pra texto: mesma linguagem, amplitude curta.
+     O stop mais escuro não desce de #d5dbe2 (12:1 sobre a base).
+     Variação grande dentro de uma palavra lê como falha de render,
+     não como metal. Aqui é brilho, não sombra. */
+  --metal-texto: linear-gradient(155deg,
+    #ffffff 0%,
+    #f4f7fa calc(var(--luz) - 8%),
+    #d5dbe2 calc(var(--luz) + 16%),
+    #ffffff calc(var(--luz) + 46%),
+    #e8edf2 100%);
+
+  /* Fio de luz que corre na quina de cima dos painéis elevados */
+  --fio-luz: linear-gradient(90deg,
+    transparent 0%,
+    var(--li-luz) calc(var(--luz) - 20%),
+    rgba(255, 255, 255, 0.42) var(--luz),
+    var(--li-luz) calc(var(--luz) + 20%),
+    transparent 100%);
+
+  /* --- Escala tipográfica: 8 degraus, razão 1.25 --- */
+  --t-3xs: 0.688rem;   /* 11px  mono micro */
+  --t-2xs: 0.75rem;    /* 12px  mono rótulo */
+  --t-xs:  0.813rem;   /* 13px  mono botão */
+  --t-sm:  0.938rem;   /* 15px  texto de apoio */
+  --t-md:  1.063rem;   /* 17px  corpo */
+  --t-lg:  1.25rem;    /* 20px  h3 pequeno */
+  --t-xl:  1.5rem;     /* 24px  h3 */
+  --t-2xl: 1.875rem;   /* 30px  h3 grande */
+  --t-3xl: clamp(2.25rem, 5vw, 3.5rem);      /* h2 */
+  --t-4xl: clamp(2.75rem, 6.4vw, 5.25rem);   /* h1 */
+
+  /* --- Escala de espaço: base 4 --- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+  --s-10: 128px;
+  --s-11: 160px;
+
+  /* --- Peso de seção: 3 níveis, não um padding pra tudo --- */
+  --sec-normal: var(--s-9);
+  --sec-virada: var(--s-10);
+  --sec-fecho:  var(--s-11);
+
+  /* --- Chanfro: a forma da marca é hexágono, não canto redondo --- */
+  --chanfro-sm: 8px;
+  --chanfro-md: 14px;
+  --chanfro-lg: 24px;
+  --raio: 0;
+
+  /* --- Movimento: uma curva só --- */
+  --ease:      cubic-bezier(0.2, 0.6, 0.2, 1);
+  --dur-hover: 180ms;
+  --dur-entra: 320ms;
+  --dur-lenta: 520ms;
+
+  /* --- Layout --- */
+  --max: 1200px;
+  --gut: var(--s-7);
+  --header-h: 84px;
+
+  /* --- Fontes --- */
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --f-body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* ===========================================================
+   02 / BASE
+   =========================================================== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--co-base);
+  color: var(--co-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-md);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.022em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p { margin: 0; text-wrap: pretty; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+::selection { background: var(--co-silver); color: var(--co-void); }
+
+:focus-visible {
+  outline: 2px solid var(--co-silver);
+  outline-offset: 3px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 var(--gut);
+}
+
+/* ===========================================================
+   03 / PRIMITIVOS
+   =========================================================== */
+
+/* ---------- Kicker: rótulo de spec-sheet ---------- */
+.kicker {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--co-label);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin: 0 0 var(--s-5);
+}
+.kicker::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  background: var(--metal);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  flex-shrink: 0;
+}
+.kicker b { color: var(--co-silver); font-weight: 500; }
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--s-4) var(--s-5);
+  cursor: pointer;
+  border: 1px solid transparent;
+  position: relative;
+  transition:
+    transform var(--dur-hover) var(--ease),
+    background-color var(--dur-hover) var(--ease),
+    color var(--dur-hover) var(--ease),
+    border-color var(--dur-hover) var(--ease),
+    box-shadow var(--dur-hover) var(--ease);
+}
+
+/* Primário: peça de metal maciça, com chanfro e aresta */
+.btn-primary {
+  background: var(--metal);
+  color: var(--co-void);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-sm)),
+    calc(100% - var(--chanfro-sm)) 100%,
+    0 100%);
+  box-shadow: 0 var(--s-1) 0 rgba(0, 0, 0, 0.5);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 var(--s-2) var(--s-5) rgba(0, 0, 0, 0.55);
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* Secundário: só a aresta usinada */
+.btn-line {
+  background: transparent;
+  color: var(--co-ink);
+  border-color: var(--li-media);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-sm)),
+    calc(100% - var(--chanfro-sm)) 100%,
+    0 100%);
+}
+.btn-line:hover {
+  border-color: var(--li-prata);
+  color: var(--co-silver);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.btn .seta { transition: transform var(--dur-hover) var(--ease); }
+.btn:hover .seta { transform: translateX(4px); }
+
+/* ===========================================================
+   04 / HEADER
+   =========================================================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(10, 11, 13, 0.78);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  border-bottom: 1px solid var(--li-fina);
+}
+/* fio de luz correndo na base do header: mesma fonte de luz da página */
+.header::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: var(--fio-luz);
+  pointer-events: none;
+}
+.header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+}
+
+.brand { display: flex; align-items: center; gap: var(--s-3); }
+/* logo prata nativo, sem fundo. Não leva filtro: o metal já está no arquivo. */
+.brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+.brand .bt {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--co-label);
+  white-space: nowrap;
+}
+.brand .bt b { color: var(--co-ink); font-weight: 600; }
+
+.nav { display: flex; align-items: center; gap: var(--s-6); }
+.nav a.link {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--co-label);
+  padding: var(--s-2) 0;
+  position: relative;
+  transition: color var(--dur-hover) var(--ease);
+}
+/* sublinhado que se abre da esquerda, 180ms */
+.nav a.link::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--co-silver);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-hover) var(--ease);
+}
+.nav a.link:hover { color: var(--co-ink); }
+.nav a.link:hover::after { transform: scaleX(1); }
+
+.nav-toggle {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--li-media);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+  content: "";
+  position: absolute;
+  left: 11px; right: 11px;
+  height: 1.5px;
+  background: var(--co-ink);
+  transition: transform var(--dur-hover) var(--ease), opacity var(--dur-hover) var(--ease);
+}
+.nav-toggle span { top: 50%; transform: translateY(-1px); }
+.nav-toggle span::before { top: -7px; }
+.nav-toggle span::after { top: 7px; }
+.nav-toggle[aria-expanded="true"] span { background: transparent; }
+.nav-toggle[aria-expanded="true"] span::before { top: 0; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span::after { top: 0; transform: rotate(-45deg); }
+
+/* ===========================================================
+   05 / HERO
+   =========================================================== */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--co-base);
+  border-bottom: 1px solid var(--li-fina);
+}
+/* malha técnica: mascarada atrás do diagrama, não solta pela tela */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--li-fina) 1px, transparent 1px),
+    linear-gradient(90deg, var(--li-fina) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(78% 78% at 76% 44%, #000 0%, transparent 68%);
+  mask-image: radial-gradient(78% 78% at 76% 44%, #000 0%, transparent 68%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+/* varredura de luz atrás da coluna de texto: ancora a coluna esquerda,
+   que antes flutuava sem apoio */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    62% 52% at 8% 42%,
+    rgba(255, 255, 255, 0.055) 0%,
+    transparent 70%);
+  pointer-events: none;
+}
+.hero-sparks {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero .wrap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* 1.14fr garante ~600px na coluna de texto: os dois CTAs cabem
+     lado a lado e a hierarquia primário/secundário não colapsa */
+  grid-template-columns: minmax(0, 1.14fr) minmax(0, 0.86fr);
+  gap: var(--s-7);
+  align-items: center;
+  padding-top: var(--s-8);
+  padding-bottom: var(--s-9);
+}
+.hero-col { max-width: 660px; }
+
+.hero h1 {
+  font-size: var(--t-4xl);
+  font-weight: 800;
+  letter-spacing: -0.038em;
+  line-height: 0.96;
+  margin: 0 0 var(--s-5);
+}
+.hero h1 .traco {
+  background: var(--metal-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--co-spec);
+}
+
+.hero .lead {
+  color: var(--co-body);
+  font-size: var(--t-lg);
+  line-height: 1.5;
+  max-width: 44ch;
+  margin: 0 0 var(--s-7);
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-bottom: var(--s-7);
+}
+
+.hero-assin {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-6);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--li-fina);
+}
+.hero-assin span {
+  font-family: var(--f-mono);
+  font-size: var(--t-3xs);
+  letter-spacing: 0.05em;
+  color: var(--co-label);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.hero-assin span::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  background: var(--co-silver);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  flex-shrink: 0;
+}
+
+/* ---------- Diagrama do sistema (assinatura) ---------- */
+.sistema { width: 100%; max-width: 540px; margin-left: auto; }
+.sistema svg { width: 100%; height: auto; overflow: visible; }
+
+.sistema .hx-out {
+  fill: var(--co-panel);
+  stroke: var(--li-prata);
+  stroke-width: 1.4;
+  transition: fill var(--dur-hover) var(--ease), stroke var(--dur-hover) var(--ease);
+}
+.sistema .cell:hover .hx-out { fill: var(--co-edge); stroke: var(--co-silver); }
+
+.sistema .hx-core { fill: url(#metalGrad); stroke: var(--co-spec); stroke-width: 1.6; }
+
+/* ramp do núcleo restilizada sem tocar no HTML */
+#metalGrad stop:nth-child(1) { stop-color: #ffffff; }
+#metalGrad stop:nth-child(2) { stop-color: #e6ebf0; }
+#metalGrad stop:nth-child(3) { stop-color: #9aa1a9; }
+#metalGrad stop:nth-child(4) { stop-color: #f6f9fc; }
+#metalGrad stop:nth-child(5) { stop-color: #aeb5bd; }
+
+.sistema .link-line {
+  stroke: var(--li-prata);
+  stroke-width: 1.1;
+  stroke-dasharray: 3 5;
+  animation: fluxo 1.8s linear infinite;
+}
+@keyframes fluxo { to { stroke-dashoffset: -16; } }
+
+.sistema .cap {
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  fill: var(--co-body);
+}
+.sistema .cell {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mod-in var(--dur-lenta) var(--ease) forwards;
+}
+@keyframes mod-in {
+  from { opacity: 0; transform: scale(0.84); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ===========================================================
+   06 / SISTEMA DE BANDAS
+   Rebaixo, base e painel elevado precisam ler como planos
+   diferentes. Antes estavam a 14 pontos de luminância e a
+   página inteira parecia um cinza só.
+   =========================================================== */
+section {
+  padding: var(--sec-normal) 0;
+  position: relative;
+  scroll-margin-top: calc(var(--header-h) + var(--s-2));
+}
+
+/* Rebaixo: mais fundo que a base + sombra interna na quina de cima */
+.banda-preta {
+  background: var(--co-void);
+  border-top: 1px solid var(--li-fina);
+  border-bottom: 1px solid var(--li-fina);
+  box-shadow:
+    inset 0 var(--s-2) var(--s-5) -8px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(0, 0, 0, 0.7);
+  padding: var(--sec-virada) 0;
+}
+
+/* Painel elevado: mais claro + fio de luz na quina + sombra embaixo */
+.banda-metal {
+  background: linear-gradient(180deg, var(--co-edge) 0%, var(--co-panel) 100%);
+  border-top: 1px solid var(--li-prata);
+  border-bottom: 1px solid var(--li-fina);
+  box-shadow: 0 var(--s-5) var(--s-8) -32px rgba(0, 0, 0, 0.9);
+  padding: var(--sec-virada) 0;
+}
+.banda-metal::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: var(--fio-luz);
+  pointer-events: none;
+}
+
+/* Fecho: contato respira mais que o resto */
+#contato { padding: var(--sec-fecho) 0; }
+
+/* ---------- Cabeçalho de seção ----------
+   Antes: 0.8fr/1.2fr com align-items:end, o que colava o
+   parágrafo no rodapé de um h2 de 3 linhas e abria um vazio
+   morto acima dele. Agora os dois partem do mesmo topo e o
+   parágrafo é anotado por uma régua, que é o dispositivo de
+   spec-sheet da marca fazendo trabalho de verdade. */
+.sec-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: var(--s-7) var(--s-8);
+  align-items: start;
+  margin-bottom: var(--s-8);
+}
+.sec-head h2 {
+  font-size: var(--t-3xl);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.0;
+  max-width: 16ch;
+}
+.sec-head .intro {
+  color: var(--co-body);
+  font-size: var(--t-md);
+  max-width: 50ch;
+  border-top: 1px solid var(--li-prata);
+  padding-top: var(--s-4);
+}
+
+/* ===========================================================
+   07 / PROBLEMA (motivos)
+   =========================================================== */
+.motivos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--li-fina);
+}
+.motivo {
+  padding: var(--s-6) var(--s-6) var(--s-6) 0;
+  border-right: 1px solid var(--li-fina);
+  position: relative;
+}
+.motivo::before {
+  content: "";
+  position: absolute;
+  left: 0; top: -1px;
+  width: var(--s-6);
+  height: 1px;
+  background: var(--co-silver);
+}
+.motivo:last-child { border-right: 0; padding-right: 0; }
+.motivo .mi {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  color: var(--co-silver);
+  letter-spacing: 0.11em;
+  margin-bottom: var(--s-5);
+  display: block;
+}
+.motivo h3 {
+  font-size: var(--t-xl);
+  font-weight: 700;
+  margin-bottom: var(--s-3);
+}
+.motivo p { color: var(--co-body); font-size: var(--t-sm); }
+
+/* ===========================================================
+   08 / FRENTES E MÓDULOS
+   =========================================================== */
+.frente-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: 0 0 var(--s-5);
+}
+.frente-tag {
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  letter-spacing: -0.024em;
+}
+.frente-sub { color: var(--co-body); font-size: var(--t-sm); }
+
+/* Cards: antes eram só borda de 1px sobre o fundo. Agora são
+   peças de chapa: superfície própria, chanfro, aresta de luz. */
+.mods {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-2);
+}
+.mod {
+  position: relative;
+  padding: var(--s-6) var(--s-5) var(--s-7);
+  background: var(--co-panel);
+  border: 1px solid var(--li-fina);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-md)),
+    calc(100% - var(--chanfro-md)) 100%,
+    0 100%);
+  transition:
+    background-color var(--dur-hover) var(--ease),
+    border-color var(--dur-hover) var(--ease),
+    transform var(--dur-hover) var(--ease);
+}
+/* fio de luz na quina superior, mesma fonte de luz da página */
+.mod::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: var(--fio-luz);
+  opacity: 0.7;
+  transition: opacity var(--dur-hover) var(--ease);
+  pointer-events: none;
+}
+.mod:hover {
+  background-color: var(--co-edge);
+  border-color: var(--li-prata);
+  transform: translateY(-3px);
+}
+.mod:hover::before { opacity: 1; }
+
+.mod .idx {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  color: var(--co-label);
+  letter-spacing: 0.1em;
+  transition: color var(--dur-hover) var(--ease);
+}
+.mod:hover .idx { color: var(--co-silver); }
+.mod h3 {
+  font-size: var(--t-lg);
+  font-weight: 700;
+  margin: var(--s-5) 0 var(--s-3);
+}
+.mod p { color: var(--co-body); font-size: var(--t-sm); }
+
+/* marcador de canto: aparece no chanfro, onde a peça foi cortada */
+.mod .tick {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: var(--chanfro-md);
+  height: var(--chanfro-md);
+  background: var(--metal);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  opacity: 0;
+  transition: opacity var(--dur-hover) var(--ease);
+}
+.mod:hover .tick { opacity: 1; }
+
+/* módulos sobre painel elevado precisam de mais separação */
+.banda-metal .mod { background: rgba(8, 9, 10, 0.42); border-color: var(--li-media); }
+.banda-metal .mod:hover { background: rgba(8, 9, 10, 0.62); border-color: var(--li-prata); }
+
+/* ===========================================================
+   09 / COMO FUNCIONA (sequência real, por isso é numerada)
+   =========================================================== */
+.passos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-7);
+}
+.passo {
+  position: relative;
+  padding-top: var(--s-6);
+  border-top: 1px solid var(--li-media);
+}
+/* trecho prata da régua: marca onde a etapa começa */
+.passo::before {
+  content: "";
+  position: absolute;
+  left: 0; top: -1px;
+  width: var(--s-8);
+  height: 1px;
+  background: var(--metal);
+}
+.passo .pn {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  color: var(--co-silver);
+  letter-spacing: 0.11em;
+}
+/* número gravado na chapa, não impresso por cima dela */
+.passo .pnum {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-size: 4rem;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.55);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.07);
+  position: absolute;
+  top: var(--s-5);
+  right: 0;
+  pointer-events: none;
+  user-select: none;
+}
+.passo h3 {
+  font-size: var(--t-xl);
+  font-weight: 700;
+  margin: var(--s-4) 0 var(--s-3);
+}
+.passo p { color: var(--co-body); font-size: var(--t-sm); }
+
+/* ===========================================================
+   10 / DIFERENCIAL (pilares)
+   =========================================================== */
+.pilares {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--li-fina);
+}
+.pilar {
+  padding: var(--s-6) var(--s-5) var(--s-6) 0;
+  border-right: 1px solid var(--li-fina);
+  position: relative;
+}
+.pilar::before {
+  content: "";
+  position: absolute;
+  left: 0; top: -1px;
+  width: var(--s-5);
+  height: 1px;
+  background: var(--co-silver);
+}
+.pilar:last-child { border-right: 0; padding-right: 0; }
+.pilar .tag {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--co-silver);
+  display: block;
+  margin-bottom: var(--s-5);
+}
+.pilar h3 { font-size: var(--t-lg); font-weight: 700; margin-bottom: var(--s-3); }
+.pilar p { color: var(--co-body); font-size: var(--t-sm); }
+
+/* ===========================================================
+   11 / SOBRE
+   =========================================================== */
+.sobre-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--s-8);
+  align-items: start;
+}
+.sobre-lead {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-2xl);
+  line-height: 1.22;
+  letter-spacing: -0.018em;
+  margin-bottom: var(--s-5);
+}
+.sobre-grid > div > p { color: var(--co-body); font-size: var(--t-sm); }
+
+.sobre-list { border-top: 1px solid var(--li-prata); }
+.sobre-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-5);
+  padding: var(--s-5) 0;
+  border-bottom: 1px solid var(--li-fina);
+}
+.sobre-item .cod {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--co-silver);
+  letter-spacing: 0.08em;
+  padding-top: 3px;
+}
+.sobre-item b {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+  margin-bottom: var(--s-1);
+}
+.sobre-item span { color: var(--co-body); font-size: var(--t-sm); }
+
+/* ===========================================================
+   12 / FAQ
+   =========================================================== */
+.faq-list { border-top: 1px solid var(--li-prata); }
+.faq-item { border-bottom: 1px solid var(--li-fina); }
+.faq-item summary {
+  cursor: pointer;
+  list-style: none;
+  padding: var(--s-5) 0;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  letter-spacing: -0.014em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s-5);
+  transition: color var(--dur-hover) var(--ease);
+}
+.faq-item summary:hover { color: var(--co-silver); }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: "";
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+  background: var(--metal);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  transition: transform var(--dur-entra) var(--ease);
+}
+.faq-item[open] summary::after { transform: rotate(180deg); }
+.faq-item p {
+  color: var(--co-body);
+  font-size: var(--t-sm);
+  padding: 0 0 var(--s-5);
+  max-width: 72ch;
+}
+
+/* ===========================================================
+   13 / CONTATO
+   =========================================================== */
+.contato-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--s-8);
+  align-items: start;
+}
+.contato-h {
+  font-size: var(--t-3xl);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.0;
+  margin-bottom: var(--s-5);
+  max-width: 14ch;
+}
+.contato-p {
+  color: var(--co-body);
+  font-size: var(--t-md);
+  margin-bottom: var(--s-7);
+  max-width: 44ch;
+}
+.contato-canais { display: flex; flex-direction: column; }
+.contato-canal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-4);
+  padding: var(--s-5) 0;
+  border-top: 1px solid var(--li-media);
+}
+.contato-canal .cod {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  color: var(--co-silver);
+  letter-spacing: 0.08em;
+  padding-top: 3px;
+}
+.contato-canal b {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+}
+.contato-canal span { color: var(--co-body); font-size: var(--t-sm); }
+
+/* Formulário: painel rebaixado dentro do painel elevado */
+.form {
+  background: var(--co-void);
+  border: 1px solid var(--li-media);
+  padding: var(--s-7);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-4);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-lg)),
+    calc(100% - var(--chanfro-lg)) 100%,
+    0 100%);
+  box-shadow: inset 0 var(--s-2) var(--s-6) -20px rgba(0, 0, 0, 1);
+}
+.form .campo { display: flex; flex-direction: column; gap: var(--s-2); }
+.form .campo.full { grid-column: 1 / -1; }
+.form label {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--co-label);
+}
+.form input,
+.form select,
+.form textarea {
+  background: var(--co-base);
+  border: 1px solid var(--li-media);
+  padding: var(--s-3) var(--s-4);
+  color: var(--co-ink);
+  font-family: var(--f-body);
+  font-size: var(--t-sm);
+  outline: none;
+  transition: border-color var(--dur-hover) var(--ease), background-color var(--dur-hover) var(--ease);
+}
+.form input::placeholder,
+.form textarea::placeholder { color: var(--co-label); }
+.form input:hover,
+.form select:hover,
+.form textarea:hover { border-color: var(--li-prata); }
+.form input:focus,
+.form select:focus,
+.form textarea:focus {
+  border-color: var(--co-silver);
+  background-color: var(--co-panel);
+}
+.form textarea { resize: vertical; min-height: 104px; }
+.form .btn { justify-self: start; border: none; margin-top: var(--s-1); }
+.form .form-nota {
+  grid-column: 1 / -1;
+  color: var(--co-label);
+  font-size: var(--t-2xs);
+  line-height: 1.5;
+}
+
+/* ===========================================================
+   14 / FOOTER
+   =========================================================== */
+.footer {
+  background: var(--co-void);
+  padding: var(--s-9) 0 var(--s-7);
+  border-top: 1px solid var(--li-fina);
+}
+.footer .grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-7);
+}
+.footer .brand img { width: 38px; height: 38px; }
+.footer .info {
+  color: var(--co-body);
+  font-size: var(--t-sm);
+  max-width: 34ch;
+  margin-top: var(--s-4);
+}
+.footer .cols { display: flex; gap: var(--s-9); flex-wrap: wrap; }
+.footer h4 {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: var(--t-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--co-label);
+  margin: 0 0 var(--s-4);
+}
+.footer a.fl,
+.footer span.fl {
+  display: block;
+  color: var(--co-body);
+  margin-bottom: var(--s-3);
+  font-size: var(--t-sm);
+  transition: color var(--dur-hover) var(--ease);
+}
+.footer a.fl:hover { color: var(--co-silver); }
+.footer .base {
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--li-fina);
+  color: var(--co-label);
+  font-family: var(--f-mono);
+  font-size: var(--t-3xs);
+  letter-spacing: 0.04em;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+}
+
+/* ===========================================================
+   15 / WHATSAPP FLUTUANTE
+   =========================================================== */
+.wa-float {
+  position: fixed;
+  right: var(--s-5);
+  bottom: var(--s-5);
+  z-index: 60;
+  background: var(--metal);
+  color: var(--co-void);
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: var(--t-2xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: var(--s-3) var(--s-5);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-sm)),
+    calc(100% - var(--chanfro-sm)) 100%,
+    0 100%);
+  box-shadow: 0 var(--s-3) var(--s-6) rgba(0, 0, 0, 0.55);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  transition: transform var(--dur-hover) var(--ease), box-shadow var(--dur-hover) var(--ease);
+}
+.wa-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 var(--s-5) var(--s-8) rgba(0, 0, 0, 0.6);
+}
+/* SVG inline: herda a cor do botão, sem requisição e sem blend-mode */
+.wa-icon { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
+
+/* ===========================================================
+   16 / POP-UP DE SAÍDA
+   =========================================================== */
+.exit-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(4, 5, 6, 0.76);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-5);
+}
+.exit-overlay.aberto { display: flex; animation: fade-in var(--dur-entra) var(--ease); }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.exit-modal {
+  position: relative;
+  width: 100%;
+  max-width: 470px;
+  background: var(--co-panel);
+  border: 1px solid var(--li-prata);
+  padding: var(--s-7) var(--s-7) var(--s-6);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-lg)),
+    calc(100% - var(--chanfro-lg)) 100%,
+    0 100%);
+  animation: modal-in var(--dur-entra) var(--ease);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.exit-modal::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: var(--fio-luz);
+}
+.exit-modal .kicker { margin-bottom: var(--s-4); }
+.exit-modal h3 {
+  font-size: var(--t-2xl);
+  font-weight: 800;
+  margin-bottom: var(--s-3);
+  letter-spacing: -0.024em;
+}
+.exit-modal p { color: var(--co-body); font-size: var(--t-sm); margin-bottom: var(--s-6); }
+.exit-fechar {
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--li-media);
+  background: transparent;
+  color: var(--co-label);
+  cursor: pointer;
+  font-size: var(--t-lg);
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  transition: color var(--dur-hover) var(--ease), border-color var(--dur-hover) var(--ease);
+}
+.exit-fechar:hover { color: var(--co-ink); border-color: var(--co-silver); }
+
+/* ===========================================================
+   17 / MOVIMENTO
+   Dois pesos: bloco de seção sobe, card é revelado como painel.
+
+   .reveal NÃO pode usar clip-path: é o próprio elemento observado
+   pelo IntersectionObserver, e um clip que zera a caixa zera também
+   a área de interseção. O observer nunca dispara, .in nunca entra e
+   o conteúdo some pra sempre. O wipe só é seguro em .reveal-group > *,
+   onde quem é observado é o pai, sem recorte.
+   =========================================================== */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(var(--s-4));
+  transition:
+    opacity var(--dur-lenta) var(--ease),
+    transform var(--dur-lenta) var(--ease);
+}
+.js .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+.js .reveal-group > * {
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transform: translateY(var(--s-3));
+  transition:
+    opacity var(--dur-entra) var(--ease),
+    clip-path var(--dur-entra) var(--ease),
+    transform var(--dur-entra) var(--ease);
+}
+.js .reveal-group.in > * {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transform: none;
+}
+.js .reveal-group.in > *:nth-child(2) { transition-delay: 60ms; }
+.js .reveal-group.in > *:nth-child(3) { transition-delay: 120ms; }
+.js .reveal-group.in > *:nth-child(4) { transition-delay: 180ms; }
+.js .reveal-group.in > *:nth-child(5) { transition-delay: 240ms; }
+.js .reveal-group.in > *:nth-child(6) { transition-delay: 300ms; }
+
+/* ===========================================================
+   18 / RESPONSIVO
+   =========================================================== */
+@media (max-width: 1080px) {
+  .mods { grid-template-columns: repeat(2, 1fr); }
+  .pilares { grid-template-columns: repeat(2, 1fr); }
+  .pilar:nth-child(2n) { border-right: 0; padding-right: 0; }
+  .pilar:nth-child(n + 3) { border-top: 1px solid var(--li-fina); padding-top: var(--s-6); }
+}
+
+@media (max-width: 940px) {
+  :root {
+    --gut: var(--s-5);
+    --sec-normal: var(--s-8);
+    --sec-virada: var(--s-9);
+    --sec-fecho: var(--s-9);
+    --header-h: 72px;
+  }
+
+  .hero .wrap {
+    grid-template-columns: 1fr;
+    gap: var(--s-7);
+    padding-top: var(--s-7);
+    padding-bottom: var(--s-8);
+  }
+  .hero-col { max-width: none; }
+  .hero .lead { max-width: none; }
+  /* diagrama menor pra assinatura caber logo abaixo da dobra */
+  .sistema { max-width: 340px; margin: 0 auto; }
+  .hero::before {
+    -webkit-mask-image: radial-gradient(90% 60% at 50% 72%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(90% 60% at 50% 72%, #000 0%, transparent 72%);
+  }
+
+  .sec-head,
+  .sobre-grid,
+  .contato-wrap { grid-template-columns: 1fr; gap: var(--s-5); }
+  .sec-head h2, .contato-h { max-width: none; }
+  .sec-head { margin-bottom: var(--s-7); }
+
+  .motivos, .pilares { grid-template-columns: 1fr; }
+  .motivo, .pilar {
+    border-right: 0;
+    border-bottom: 1px solid var(--li-fina);
+    padding: var(--s-6) 0;
+  }
+  .pilar:nth-child(n + 3) { border-top: 0; padding-top: var(--s-6); }
+  .motivo:last-child, .pilar:last-child { border-bottom: 0; }
+
+  .passos { grid-template-columns: 1fr; gap: var(--s-5); }
+
+  .header .wrap { height: var(--header-h); }
+  .nav-toggle { display: block; }
+  .nav .link, .nav > .btn { display: none; }
+  .nav.aberto {
+    position: fixed;
+    top: var(--header-h);
+    left: 0; right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--co-void);
+    border-bottom: 1px solid var(--li-prata);
+    padding: 0 0 var(--s-4);
+  }
+  .nav.aberto .link {
+    display: block;
+    padding: var(--s-4) var(--gut);
+    border-top: 1px solid var(--li-fina);
+  }
+  .nav.aberto .link::after { display: none; }
+  .nav.aberto > .btn {
+    display: inline-flex;
+    margin: var(--s-4) var(--gut) 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 560px) {
+  :root { --gut: var(--s-4); }
+  body { font-size: var(--t-sm); }
+
+  /* a tagline não cabe ao lado do logo e do toggle em 375px.
+     font-size:0 no container derruba o nó de texto solto e mantém
+     só o "JN IA". O link já carrega aria-label com o nome completo. */
+  .brand .bt { font-size: 0; }
+  .brand .bt b { font-size: var(--t-xs); }
+  .brand img { width: 38px; height: 38px; }
+
+  .kicker { font-size: var(--t-3xs); letter-spacing: 0.1em; gap: var(--s-2); }
+  .hero h1 { letter-spacing: -0.03em; }
+
+  .mods { grid-template-columns: 1fr; }
+  .btn { width: 100%; }
+  .hero-cta { flex-direction: column; }
+
+  .form { grid-template-columns: 1fr; padding: var(--s-5) var(--s-4); }
+  .form .btn { justify-self: stretch; }
+
+  /* o pill flutuante estava por cima do formulário */
+  #contato { padding-bottom: var(--s-10); }
+  .wa-float span { display: none; }
+  .wa-float { padding: var(--s-4); }
+  .wa-icon { width: 24px; height: 24px; }
+
+  .footer .cols { gap: var(--s-7); }
+  .footer .base { flex-direction: column; gap: var(--s-2); }
+}
+
+/* ===========================================================
+   19 / MOVIMENTO REDUZIDO
+   A luz para, a chapa continua. Nada de conteúdo escondido.
+   =========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .sistema .cell { animation: none; opacity: 1; }
+  .sistema .link-line { animation: none; }
+  .js .reveal,
+  .js .reveal-group > * {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+}

@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# IAs generativas liberadas para citar a JN IA (GEO)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://jnia.com.br/sitemap.xml
