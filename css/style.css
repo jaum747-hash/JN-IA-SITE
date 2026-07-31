@@ -281,7 +281,8 @@ img { max-width: 100%; display: block; }
   height: var(--header-h);
 }
 
-.brand { display: flex; align-items: center; gap: var(--s-3); }
+/* padding vertical garante ~46px de área de toque sem mudar o visual */
+.brand { display: flex; align-items: center; gap: var(--s-3); padding: var(--s-1) 0; }
 /* logo prata nativo, sem fundo. Não leva filtro: o metal já está no arquivo. */
 .brand img {
   width: 42px;
@@ -1253,7 +1254,13 @@ section {
 }
 
 @media (max-width: 560px) {
-  :root { --gut: var(--s-4); }
+  :root {
+    --gut: var(--s-4);
+    /* 16px é o piso de leitura confortável no celular, e abaixo dele
+       o Safari do iPhone força zoom ao focar campo de formulário.
+       Redefinir o token sobe todo texto de apoio de uma vez. */
+    --t-sm: 1rem;
+  }
   body { font-size: var(--t-sm); }
 
   /* a tagline não cabe ao lado do logo e do toggle em 375px.
@@ -1270,8 +1277,19 @@ section {
   .btn { width: 100%; }
   .hero-cta { flex-direction: column; }
 
+  /* "Em breve" não é oferta: no empilhamento do celular custava
+     1,7 tela de rolagem. Em duas colunas ocupa metade, sem sumir. */
+  #sistemas .mods { grid-template-columns: repeat(2, 1fr); }
+  #sistemas .mod { padding: var(--s-5) var(--s-4) var(--s-6); }
+  #sistemas .mod h3 { font-size: var(--t-md); margin-top: var(--s-4); }
+  #sistemas .mod p { font-size: var(--t-2xs); line-height: 1.5; }
+
   .form { grid-template-columns: 1fr; padding: var(--s-5) var(--s-4); }
   .form .btn { justify-self: stretch; }
+  /* explícito em px: qualquer valor abaixo de 16 dispara o zoom do iOS */
+  .form input,
+  .form select,
+  .form textarea { font-size: 16px; padding: var(--s-4); }
 
   /* o pill flutuante estava por cima do formulário */
   #contato { padding-bottom: var(--s-10); }
@@ -1279,7 +1297,10 @@ section {
   .wa-float { padding: var(--s-4); }
   .wa-icon { width: 24px; height: 24px; }
 
-  .footer .cols { gap: var(--s-7); }
+  /* links do rodapé tinham 24px de altura. Dedo precisa de ~44px. */
+  .footer .cols { gap: var(--s-6); }
+  .footer a.fl,
+  .footer span.fl { padding: var(--s-3) 0; margin-bottom: 0; }
   .footer .base { flex-direction: column; gap: var(--s-2); }
 }
 

@@ -633,7 +633,9 @@
         canvas.width = Math.round(w * dpr);
         canvas.height = Math.round(h * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        var n = Math.max(24, Math.min(Math.round((w * h) / 9000), 90));
+        // celular ganha menos partícula: mesma leitura, menos trabalho por frame
+        var densidade = w < 640 ? 22000 : 9000;
+        var n = Math.max(14, Math.min(Math.round((w * h) / densidade), 90));
         parts = [];
         for (var i = 0; i < n; i++) {
           parts.push({
@@ -681,6 +683,21 @@
       // re-inicializa quando o layout e as fontes assentam (hero no tamanho cheio)
       window.addEventListener('load', reinit);
       window.addEventListener('resize', reinit);
+
+      // Sem isso o loop roda pra sempre, inclusive com o hero fora da tela.
+      // Em celular isso é bateria e travamento de graça.
+      function pausar() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+      function retomar() { if (!raf && !reduce && parts.length) raf = requestAnimationFrame(frame); }
+
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entradas) {
+          if (entradas[0].isIntersecting) retomar(); else pausar();
+        }, { threshold: 0 }).observe(canvas.parentElement || canvas);
+      }
+      // aba em segundo plano também não precisa animar
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pausar(); else retomar();
+      });
 
       function estatico() {
         ctx.clearRect(0, 0, w, h);
