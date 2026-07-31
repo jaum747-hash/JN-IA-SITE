@@ -138,6 +138,11 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  /* Mata o zoom por duplo toque (o acidental) e o atraso de 300ms no
+     clique, mas mantém a pinça intencional. Travar zoom de vez
+     (user-scalable=no) reprova em WCAG 1.4.4, bloqueia quem tem baixa
+     visão, e o iOS ignora desde 2016 de qualquer jeito. */
+  touch-action: manipulation;
 }
 
 h1, h2, h3, h4 {
