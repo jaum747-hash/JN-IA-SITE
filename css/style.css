@@ -627,21 +627,8 @@ section {
 .motivo p { color: var(--co-body); font-size: var(--t-sm); }
 
 /* ===========================================================
-   08 / FRENTES E MÓDULOS
+   08 / MÓDULOS
    =========================================================== */
-.frente-head {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--s-2) var(--s-5);
-  margin: 0 0 var(--s-5);
-}
-.frente-tag {
-  font-size: var(--t-2xl);
-  font-weight: 700;
-  letter-spacing: -0.024em;
-}
-.frente-sub { color: var(--co-body); font-size: var(--t-sm); }
 
 /* Cards: antes eram só borda de 1px sobre o fundo. Agora são
    peças de chapa: superfície própria, chanfro, aresta de luz. */
@@ -711,58 +698,125 @@ section {
 }
 .mod:hover .tick { opacity: 1; }
 
+/* "Em breve" não é oferta. Era uma seção inteira de 4 cards vendendo
+   o que ainda não está à venda. Vira uma linha: o sinal fica, o volume sai. */
+.embreve {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin-top: var(--s-6);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--li-fina);
+  color: var(--co-label);
+  font-size: var(--t-sm);
+}
+.embreve span {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--co-silver);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.embreve span::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  background: var(--metal);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+
 /* módulos sobre painel elevado precisam de mais separação */
 .banda-metal .mod { background: rgba(8, 9, 10, 0.42); border-color: var(--li-media); }
 .banda-metal .mod:hover { background: rgba(8, 9, 10, 0.62); border-color: var(--li-prata); }
 
 /* ===========================================================
-   09 / COMO FUNCIONA (sequência real, por isso é numerada)
+   09 / O MÉTODO — trilha
+   O processo é fixo, então ele tem trilho: uma linha pontilhada
+   correndo por trás dos três nós, mesma linguagem dos fios do
+   diagrama do hero. Cada etapa declara a saída que produz.
    =========================================================== */
-.passos {
+.trilha {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--s-7);
-}
-.passo {
   position: relative;
-  padding-top: var(--s-6);
-  border-top: 1px solid var(--li-media);
 }
-/* trecho prata da régua: marca onde a etapa começa */
-.passo::before {
+/* o trilho. Máscara nas pontas pra ele nascer e morrer dentro do bloco,
+   em vez de bater na borda do container. */
+.trilha::before {
   content: "";
   position: absolute;
-  left: 0; top: -1px;
-  width: var(--s-8);
+  left: 0; right: 0;
+  top: 8px;
   height: 1px;
-  background: var(--metal);
+  background-image: repeating-linear-gradient(90deg,
+    var(--co-silver) 0 3px, transparent 3px 8px);
+  opacity: 0.45;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 72%, transparent 90%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 3%, #000 72%, transparent 90%);
+  animation: trilho 1.8s linear infinite;
+  pointer-events: none;
 }
-.passo .pn {
+@keyframes trilho {
+  from { background-position: 0 0; }
+  to   { background-position: 8px 0; }
+}
+@keyframes trilho-v {
+  from { background-position: 0 0; }
+  to   { background-position: 0 8px; }
+}
+
+/* flex-column pra saída das três etapas assentar na mesma linha,
+   mesmo com parágrafo de altura diferente */
+.etapa {
+  position: relative;
+  padding-top: var(--s-6);
+  display: flex;
+  flex-direction: column;
+}
+/* nó: hexágono de metal sentado em cima do trilho */
+.etapa .no {
+  position: absolute;
+  top: 0; left: 0;
+  width: 17px;
+  height: 17px;
+  background: var(--metal);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
+.etapa .ecod {
   font-family: var(--f-mono);
   font-size: var(--t-2xs);
   color: var(--co-silver);
-  letter-spacing: 0.11em;
+  letter-spacing: 0.14em;
+  display: block;
+  margin-bottom: var(--s-3);
 }
-/* número gravado na chapa, não impresso por cima dela */
-.passo .pnum {
-  font-family: var(--f-display);
-  font-weight: 800;
-  font-size: 4rem;
-  line-height: 1;
-  color: rgba(0, 0, 0, 0.55);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.07);
-  position: absolute;
-  top: var(--s-5);
-  right: 0;
-  pointer-events: none;
-  user-select: none;
-}
-.passo h3 {
+.etapa h3 {
   font-size: var(--t-xl);
   font-weight: 700;
-  margin: var(--s-4) 0 var(--s-3);
+  margin-bottom: var(--s-3);
 }
-.passo p { color: var(--co-body); font-size: var(--t-sm); }
+.etapa p { color: var(--co-body); font-size: var(--t-sm); margin-bottom: var(--s-5); }
+/* a saída: o que a etapa entrega na mão do cliente */
+.etapa .saida {
+  display: block;
+  margin-top: auto;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--li-media);
+  font-family: var(--f-mono);
+  font-size: var(--t-3xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--co-label);
+}
+.etapa .saida::before {
+  content: "SAÍDA ";
+  color: var(--co-silver);
+}
 
 /* ===========================================================
    10 / DIFERENCIAL (pilares)
@@ -799,13 +853,28 @@ section {
 .pilar p { color: var(--co-body); font-size: var(--t-sm); }
 
 /* ===========================================================
-   11 / SOBRE
+   11 / QUEM FAZ (apresentação)
+   Não usa .sec-head: aqui o título faz parte da apresentação,
+   não é rótulo de um bloco que vem depois. Kicker no topo,
+   título e retrato dividindo a mesma linha.
+
+   O retrato fica na coluna direita de propósito: o olhar dele
+   sai pra esquerda, então aponta de volta pro texto. Invertido,
+   olharia pra fora da página.
    =========================================================== */
-.sobre-grid {
+.apresenta {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: var(--s-8);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
+  gap: var(--s-8) var(--s-9);
+  align-items: center;
+}
+.apresenta h2 {
+  font-size: var(--t-3xl);
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.0;
+  max-width: 13ch;
+  margin-bottom: var(--s-6);
 }
 .sobre-lead {
   font-family: var(--f-display);
@@ -815,9 +884,63 @@ section {
   letter-spacing: -0.018em;
   margin-bottom: var(--s-5);
 }
-.sobre-grid > div > p { color: var(--co-body); font-size: var(--t-sm); }
+.apresenta-texto > p:not(.sobre-lead) { color: var(--co-body); font-size: var(--t-sm); }
 
-.sobre-list { border-top: 1px solid var(--li-prata); }
+/* Retrato: mesma peça de chapa dos cards, com chanfro, aresta
+   prata e o fio de luz da página correndo na quina de cima. */
+.retrato {
+  position: relative;
+  margin: 0;
+  background: var(--co-panel);
+  border: 1px solid var(--li-prata);
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% calc(100% - var(--chanfro-lg)),
+    calc(100% - var(--chanfro-lg)) 100%,
+    0 100%);
+}
+.retrato::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  background: var(--fio-luz);
+  z-index: 2;
+  pointer-events: none;
+}
+/* Sem filtro. A paleta da marca governa fundo, texto e metal;
+   foto entra na cor original ou fica morta. */
+.retrato img {
+  width: 100%;
+  height: auto;
+}
+.retrato figcaption {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: var(--s-8) var(--s-5) var(--s-5);
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(8, 9, 10, 0.72) 46%,
+    rgba(8, 9, 10, 0.94) 100%);
+}
+.retrato figcaption b {
+  display: block;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: var(--t-xl);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--s-1);
+}
+.retrato figcaption span {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--co-label);
+}
+.retrato figcaption i { font-style: normal; color: var(--co-silver); }
+
+.sobre-list { border-top: 1px solid var(--li-prata); margin-top: var(--s-6); }
 .sobre-item {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -1215,9 +1338,9 @@ section {
   }
 
   .sec-head,
-  .sobre-grid,
+  .apresenta,
   .contato-wrap { grid-template-columns: 1fr; gap: var(--s-5); }
-  .sec-head h2, .contato-h { max-width: none; }
+  .sec-head h2, .contato-h, .apresenta h2 { max-width: none; }
   .sec-head { margin-bottom: var(--s-7); }
 
   .motivos, .pilares { grid-template-columns: 1fr; }
@@ -1229,7 +1352,23 @@ section {
   .pilar:nth-child(n + 3) { border-top: 0; padding-top: var(--s-6); }
   .motivo:last-child, .pilar:last-child { border-bottom: 0; }
 
-  .passos { grid-template-columns: 1fr; gap: var(--s-5); }
+  /* trilho deitado não cabe empilhado: vira vertical, à esquerda dos nós */
+  .trilha { grid-template-columns: 1fr; gap: var(--s-6); }
+  .trilha::before {
+    left: 8px; right: auto;
+    top: 0; bottom: 0;
+    width: 1px; height: auto;
+    background-image: repeating-linear-gradient(180deg,
+      var(--co-silver) 0 3px, transparent 3px 8px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 3%, #000 82%, transparent 96%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 3%, #000 82%, transparent 96%);
+    animation-name: trilho-v;
+  }
+  .etapa { padding-top: 0; padding-left: var(--s-7); }
+  .etapa .no { top: 4px; }
+
+  /* o retrato vem antes do texto: é a apresentação, não ilustração de apoio */
+  .retrato { order: -1; max-width: 380px; }
 
   .header .wrap { height: var(--header-h); }
   .nav-toggle { display: block; }
@@ -1281,13 +1420,6 @@ section {
   .mods { grid-template-columns: 1fr; }
   .btn { width: 100%; }
   .hero-cta { flex-direction: column; }
-
-  /* "Em breve" não é oferta: no empilhamento do celular custava
-     1,7 tela de rolagem. Em duas colunas ocupa metade, sem sumir. */
-  #sistemas .mods { grid-template-columns: repeat(2, 1fr); }
-  #sistemas .mod { padding: var(--s-5) var(--s-4) var(--s-6); }
-  #sistemas .mod h3 { font-size: var(--t-md); margin-top: var(--s-4); }
-  #sistemas .mod p { font-size: var(--t-2xs); line-height: 1.5; }
 
   .form { grid-template-columns: 1fr; padding: var(--s-5) var(--s-4); }
   .form .btn { justify-self: stretch; }
