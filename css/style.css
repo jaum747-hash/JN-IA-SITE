@@ -79,7 +79,9 @@
   --t-xl:  1.5rem;     /* 24px  h3 */
   --t-2xl: 1.875rem;   /* 30px  h3 grande */
   --t-3xl: clamp(2.25rem, 5vw, 3.5rem);      /* h2 */
-  --t-4xl: clamp(2.75rem, 6.4vw, 5.25rem);   /* h1 */
+  /* h1: 1.25 sobre o h2, que é a razão da escala. O valor antigo (5.25rem)
+     era 1.5, e com a headline nova jogava o CTA pra fora da dobra. */
+  --t-4xl: clamp(2.5rem, 5.2vw, 4.375rem);
 
   /* --- Escala de espaço: base 4 --- */
   --s-1: 4px;
@@ -284,6 +286,19 @@ img { max-width: 100%; display: block; }
   align-items: center;
   justify-content: space-between;
   height: var(--header-h);
+}
+
+/* Progresso da página: a mesma chapa de metal sendo revelada da esquerda
+   pra direita. Fica sobre o fio de luz, na base do header. */
+.progresso {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: var(--metal);
+  transform: scaleX(0);
+  transform-origin: left center;
+  z-index: 1;
+  pointer-events: none;
 }
 
 /* padding vertical garante ~46px de área de toque sem mudar o visual */
@@ -506,15 +521,19 @@ img { max-width: 100%; display: block; }
   letter-spacing: 0.1em;
   fill: var(--co-body);
 }
+/* entrada é do GSAP. Sem ele (falha de rede, script bloqueado) a regra
+   .no-gsap devolve tudo visível, então nada depende de JS pra existir. */
 .sistema .cell {
-  opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: mod-in var(--dur-lenta) var(--ease) forwards;
 }
-@keyframes mod-in {
-  from { opacity: 0; transform: scale(0.84); }
-  to   { opacity: 1; transform: scale(1); }
+.js .sistema .cell { opacity: 0; }
+.js.no-gsap .sistema .cell { opacity: 1; }
+
+/* pulso: o contato viajando do ponto de contato até o centro */
+.sistema .pulso {
+  fill: var(--co-spec);
+  opacity: 0;
 }
 
 /* ===========================================================
@@ -634,7 +653,7 @@ section {
    peças de chapa: superfície própria, chanfro, aresta de luz. */
 .mods {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--s-2);
 }
 .mod {
@@ -819,38 +838,139 @@ section {
 }
 
 /* ===========================================================
-   10 / DIFERENCIAL (pilares)
+   10 / A CAUSA — tentativas
+   Ficha técnica do que o cliente já tentou. Cada linha é um
+   registro: código gravado, o que ele fez, por que não sustenta.
    =========================================================== */
-.pilares {
+.tentativas { border-top: 1px solid var(--li-prata); }
+.tent {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-top: 1px solid var(--li-fina);
+  grid-template-columns: 64px minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--s-5);
+  align-items: baseline;
+  padding: var(--s-5) 0;
+  border-bottom: 1px solid var(--li-fina);
+  transition: background-color var(--dur-hover) var(--ease);
 }
-.pilar {
-  padding: var(--s-6) var(--s-5) var(--s-6) 0;
-  border-right: 1px solid var(--li-fina);
-  position: relative;
-}
-.pilar::before {
-  content: "";
-  position: absolute;
-  left: 0; top: -1px;
-  width: var(--s-5);
-  height: 1px;
-  background: var(--co-silver);
-}
-.pilar:last-child { border-right: 0; padding-right: 0; }
-.pilar .tag {
+.tent:hover { background-color: rgba(255, 255, 255, 0.02); }
+.tent .tcod {
   font-family: var(--f-mono);
   font-size: var(--t-2xs);
   letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--co-silver);
-  display: block;
-  margin-bottom: var(--s-5);
 }
-.pilar h3 { font-size: var(--t-lg); font-weight: 700; margin-bottom: var(--s-3); }
-.pilar p { color: var(--co-body); font-size: var(--t-sm); }
+.tent h3 {
+  font-size: var(--t-lg);
+  font-weight: 700;
+  letter-spacing: -0.016em;
+}
+.tent p { color: var(--co-body); font-size: var(--t-sm); }
+
+/* A virada da seção: uma frase só, no peso de display, com a régua
+   prata do lado. É o ponto onde o diagnóstico vira causa. */
+.virada {
+  margin-top: var(--s-8);
+  padding-left: var(--s-6);
+  border-left: 2px solid var(--co-silver);
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-2xl);
+  line-height: 1.22;
+  letter-spacing: -0.018em;
+  max-width: 30ch;
+}
+
+/* ===========================================================
+   11 / O PDI
+   O nome ocupa a coluna inteira da esquerda, no peso do h1 de
+   seção. A definição fica anotada à direita, como legenda de
+   spec-sheet, não como parágrafo solto.
+   =========================================================== */
+.pdi-def {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-6) var(--s-8);
+  align-items: start;
+  margin-bottom: var(--s-9);
+}
+.pdi-nome {
+  font-size: var(--t-3xl);
+  font-weight: 800;
+  letter-spacing: -0.034em;
+  line-height: 0.98;
+  max-width: 12ch;
+  background: var(--metal-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--co-spec);
+}
+/* A sigla é o que o Instagram e o menu chamam de PDI. Fica gravada
+   embaixo do nome por extenso, pra os dois lerem como a mesma coisa. */
+.pdi-sigla {
+  display: inline-block;
+  margin-top: var(--s-6);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--li-prata);
+  font-family: var(--f-mono);
+  font-size: var(--t-lg);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: var(--co-silver);
+}
+
+.pdi-texto { border-top: 1px solid var(--li-prata); padding-top: var(--s-5); }
+.pdi-lead {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-xl);
+  line-height: 1.3;
+  letter-spacing: -0.016em;
+  margin-bottom: var(--s-4);
+}
+.pdi-texto p:not(.pdi-lead) { color: var(--co-body); font-size: var(--t-sm); }
+
+/* Contraste: como está / como fica. Duas colunas, mesma linha.
+   A diferença é peso e família, nunca contraste de cor rebaixado,
+   que quebraria a leitura de quem enxerga pouco. */
+.contraste { border-top: 1px solid var(--li-prata); }
+.ct-linha {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: var(--s-5) var(--s-7);
+  align-items: center;
+  padding: var(--s-5) 0;
+  border-bottom: 1px solid var(--li-fina);
+}
+.ct-head { padding: var(--s-3) 0; border-bottom-color: var(--li-media); }
+.ct-lab {
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--co-label);
+}
+.ct-lab.ct-on { color: var(--co-silver); }
+.ct-de { color: var(--co-body); font-size: var(--t-sm); }
+.ct-pra {
+  position: relative;
+  padding-left: var(--s-5);
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-lg);
+  line-height: 1.24;
+  letter-spacing: -0.016em;
+}
+.ct-pra::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.42em;
+  width: 9px;
+  height: 9px;
+  background: var(--metal);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+}
 
 /* ===========================================================
    11 / QUEM FAZ (apresentação)
@@ -1126,7 +1246,9 @@ section {
   margin-top: var(--s-4);
 }
 .footer .cols { display: flex; gap: var(--s-9); flex-wrap: wrap; }
-.footer h4 {
+/* h3, não h4: o último título antes do rodapé é um h2, e pular nível
+   reprova a ordem de cabeçalhos. O peso visual é o mesmo. */
+.footer h3 {
   font-family: var(--f-mono);
   font-weight: 500;
   font-size: var(--t-2xs);
@@ -1263,54 +1385,52 @@ section {
 
 /* ===========================================================
    17 / MOVIMENTO
-   Dois pesos: bloco de seção sobe, card é revelado como painel.
+   Quem anima é o GSAP (js/site.js). O CSS só declara o estado
+   escondido de partida, e só quando o JS está vivo.
 
-   .reveal NÃO pode usar clip-path: é o próprio elemento observado
-   pelo IntersectionObserver, e um clip que zera a caixa zera também
-   a área de interseção. O observer nunca dispara, .in nunca entra e
-   o conteúdo some pra sempre. O wipe só é seguro em .reveal-group > *,
-   onde quem é observado é o pai, sem recorte.
+   Sem transition aqui de propósito: transição do CSS brigando com
+   tween inline do GSAP dá tremida na entrada. Uma coisa só manda.
+
+   .no-gsap é a rede de segurança: se o GSAP não carregar, o site.js
+   marca a raiz e tudo volta a ser visível. Conteúdo nunca depende
+   de biblioteca externa pra aparecer.
+
+   Nada de wipe por clip-path na entrada: metade desses filhos são
+   cards com chanfro hexagonal, que é clip-path também. Um sobrescreve
+   o outro e o card perde o corte. Entrada é opacidade e deslocamento.
    =========================================================== */
-.js .reveal {
+.js .reveal,
+.js .reveal-group > *,
+.js [data-hero] {
   opacity: 0;
-  transform: translateY(var(--s-4));
-  transition:
-    opacity var(--dur-lenta) var(--ease),
-    transform var(--dur-lenta) var(--ease);
 }
-.js .reveal.in {
+
+.js.no-gsap .reveal,
+.js.no-gsap .reveal-group > *,
+.js.no-gsap [data-hero] {
   opacity: 1;
   transform: none;
 }
 
-.js .reveal-group > * {
-  opacity: 0;
-  clip-path: inset(0 0 100% 0);
-  transform: translateY(var(--s-3));
-  transition:
-    opacity var(--dur-entra) var(--ease),
-    clip-path var(--dur-entra) var(--ease),
-    transform var(--dur-entra) var(--ease);
+/* Título quebrado em linhas pelo SplitText: cada linha sobe por trás
+   de uma máscara. O padding compensa o corte de descida (g, p, y) que
+   a máscara faria na altura exata da linha. */
+.split .linha {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
 }
-.js .reveal-group.in > * {
-  opacity: 1;
-  clip-path: inset(0 0 0 0);
-  transform: none;
-}
-.js .reveal-group.in > *:nth-child(2) { transition-delay: 60ms; }
-.js .reveal-group.in > *:nth-child(3) { transition-delay: 120ms; }
-.js .reveal-group.in > *:nth-child(4) { transition-delay: 180ms; }
-.js .reveal-group.in > *:nth-child(5) { transition-delay: 240ms; }
-.js .reveal-group.in > *:nth-child(6) { transition-delay: 300ms; }
 
 /* ===========================================================
    18 / RESPONSIVO
    =========================================================== */
 @media (max-width: 1080px) {
   .mods { grid-template-columns: repeat(2, 1fr); }
-  .pilares { grid-template-columns: repeat(2, 1fr); }
-  .pilar:nth-child(2n) { border-right: 0; padding-right: 0; }
-  .pilar:nth-child(n + 3) { border-top: 1px solid var(--li-fina); padding-top: var(--s-6); }
+  /* o código sai da própria coluna e passa a rotular a linha */
+  .tent {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: var(--s-3) var(--s-5);
+  }
+  .tent p { grid-column: 2; }
 }
 
 @media (max-width: 940px) {
@@ -1339,18 +1459,33 @@ section {
 
   .sec-head,
   .apresenta,
-  .contato-wrap { grid-template-columns: 1fr; gap: var(--s-5); }
-  .sec-head h2, .contato-h, .apresenta h2 { max-width: none; }
+  .contato-wrap,
+  .pdi-def { grid-template-columns: 1fr; gap: var(--s-5); }
+  .sec-head h2, .contato-h, .apresenta h2, .pdi-nome { max-width: none; }
   .sec-head { margin-bottom: var(--s-7); }
+  .pdi-def { margin-bottom: var(--s-8); }
 
-  .motivos, .pilares { grid-template-columns: 1fr; }
-  .motivo, .pilar {
+  .motivos { grid-template-columns: 1fr; }
+  .motivo {
     border-right: 0;
     border-bottom: 1px solid var(--li-fina);
     padding: var(--s-6) 0;
   }
-  .pilar:nth-child(n + 3) { border-top: 0; padding-top: var(--s-6); }
-  .motivo:last-child, .pilar:last-child { border-bottom: 0; }
+  .motivo:last-child { border-bottom: 0; }
+
+  /* contraste empilhado: "hoje" vira legenda do "com posicionamento",
+     não uma segunda coluna que ninguém alinha no celular */
+  .ct-linha { grid-template-columns: 1fr; gap: var(--s-2); }
+  .ct-head { display: none; }
+  .ct-de::before {
+    content: "HOJE ";
+    font-family: var(--f-mono);
+    font-size: var(--t-3xs);
+    letter-spacing: 0.14em;
+    color: var(--co-label);
+  }
+  .ct-pra { padding-left: var(--s-5); }
+  .virada { font-size: var(--t-xl); max-width: none; }
 
   /* trilho deitado não cabe empilhado: vira vertical, à esquerda dos nós */
   .trilha { grid-template-columns: 1fr; gap: var(--s-6); }
@@ -1452,12 +1587,14 @@ section {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .sistema .cell { animation: none; opacity: 1; }
   .sistema .link-line { animation: none; }
+  .js .sistema .cell,
   .js .reveal,
-  .js .reveal-group > * {
+  .js .reveal-group > *,
+  .js [data-hero] {
     opacity: 1 !important;
-    clip-path: none !important;
     transform: none !important;
   }
+  .sistema .pulso { display: none; }
+  .progresso { display: none; }
 }
