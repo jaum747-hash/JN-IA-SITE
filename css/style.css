@@ -69,15 +69,15 @@
     var(--li-luz) calc(var(--luz) + 20%),
     transparent 100%);
 
-  /* --- Escala tipográfica: 8 degraus, razão 1.25 --- */
-  --t-3xs: 0.688rem;   /* 11px  mono micro */
-  --t-2xs: 0.75rem;    /* 12px  mono rótulo */
-  --t-xs:  0.813rem;   /* 13px  mono botão */
-  --t-sm:  0.938rem;   /* 15px  texto de apoio */
-  --t-md:  1.063rem;   /* 17px  corpo */
-  --t-lg:  1.25rem;    /* 20px  h3 pequeno */
-  --t-xl:  1.5rem;     /* 24px  h3 */
-  --t-2xl: 1.875rem;   /* 30px  h3 grande */
+  /* --- Escala tipográfica: 8 degraus --- */
+  --t-3xs: 0.75rem;    /* 12px  mono micro */
+  --t-2xs: 0.813rem;   /* 13px  mono rótulo */
+  --t-xs:  0.875rem;   /* 14px  mono botão */
+  --t-sm:  1rem;        /* 16px  texto de apoio */
+  --t-md:  1.125rem;   /* 18px  corpo */
+  --t-lg:  1.375rem;   /* 22px  h3 pequeno */
+  --t-xl:  1.625rem;   /* 26px  h3 */
+  --t-2xl: 2rem;        /* 32px  h3 grande */
   --t-3xl: clamp(2.25rem, 5vw, 3.5rem);      /* h2 */
   /* h1: 1.25 sobre o h2, que é a razão da escala. O valor antigo (5.25rem)
      era 1.5, e com a headline nova jogava o CTA pra fora da dobra. */
@@ -485,57 +485,6 @@ img { max-width: 100%; display: block; }
   flex-shrink: 0;
 }
 
-/* ---------- Diagrama do sistema (assinatura) ---------- */
-.sistema { width: 100%; max-width: 540px; margin-left: auto; }
-.sistema svg { width: 100%; height: auto; overflow: visible; }
-
-.sistema .hx-out {
-  fill: var(--co-panel);
-  stroke: var(--li-prata);
-  stroke-width: 1.4;
-  transition: fill var(--dur-hover) var(--ease), stroke var(--dur-hover) var(--ease);
-}
-.sistema .cell:hover .hx-out { fill: var(--co-edge); stroke: var(--co-silver); }
-
-.sistema .hx-core { fill: url(#metalGrad); stroke: var(--co-spec); stroke-width: 1.6; }
-
-/* ramp do núcleo restilizada sem tocar no HTML */
-#metalGrad stop:nth-child(1) { stop-color: #ffffff; }
-#metalGrad stop:nth-child(2) { stop-color: #e6ebf0; }
-#metalGrad stop:nth-child(3) { stop-color: #9aa1a9; }
-#metalGrad stop:nth-child(4) { stop-color: #f6f9fc; }
-#metalGrad stop:nth-child(5) { stop-color: #aeb5bd; }
-
-.sistema .link-line {
-  stroke: var(--li-prata);
-  stroke-width: 1.1;
-  stroke-dasharray: 3 5;
-  animation: fluxo 1.8s linear infinite;
-}
-@keyframes fluxo { to { stroke-dashoffset: -16; } }
-
-.sistema .cap {
-  font-family: var(--f-mono);
-  font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  fill: var(--co-body);
-}
-/* entrada é do GSAP. Sem ele (falha de rede, script bloqueado) a regra
-   .no-gsap devolve tudo visível, então nada depende de JS pra existir. */
-.sistema .cell {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-.js .sistema .cell { opacity: 0; }
-.js.no-gsap .sistema .cell { opacity: 1; }
-
-/* pulso: o contato viajando do ponto de contato até o centro */
-.sistema .pulso {
-  fill: var(--co-spec);
-  opacity: 0;
-}
-
 /* ===========================================================
    06 / SISTEMA DE BANDAS
    Rebaixo, base e painel elevado precisam ler como planos
@@ -838,49 +787,6 @@ section {
 }
 
 /* ===========================================================
-   10 / A CAUSA — tentativas
-   Ficha técnica do que o cliente já tentou. Cada linha é um
-   registro: código gravado, o que ele fez, por que não sustenta.
-   =========================================================== */
-.tentativas { border-top: 1px solid var(--li-prata); }
-.tent {
-  display: grid;
-  grid-template-columns: 64px minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: var(--s-5);
-  align-items: baseline;
-  padding: var(--s-5) 0;
-  border-bottom: 1px solid var(--li-fina);
-  transition: background-color var(--dur-hover) var(--ease);
-}
-.tent:hover { background-color: rgba(255, 255, 255, 0.02); }
-.tent .tcod {
-  font-family: var(--f-mono);
-  font-size: var(--t-2xs);
-  letter-spacing: 0.12em;
-  color: var(--co-silver);
-}
-.tent h3 {
-  font-size: var(--t-lg);
-  font-weight: 700;
-  letter-spacing: -0.016em;
-}
-.tent p { color: var(--co-body); font-size: var(--t-sm); }
-
-/* A virada da seção: uma frase só, no peso de display, com a régua
-   prata do lado. É o ponto onde o diagnóstico vira causa. */
-.virada {
-  margin-top: var(--s-8);
-  padding-left: var(--s-6);
-  border-left: 2px solid var(--co-silver);
-  font-family: var(--f-display);
-  font-weight: 600;
-  font-size: var(--t-2xl);
-  line-height: 1.22;
-  letter-spacing: -0.018em;
-  max-width: 30ch;
-}
-
-/* ===========================================================
    11 / O PDI
    O nome ocupa a coluna inteira da esquerda, no peso do h1 de
    seção. A definição fica anotada à direita, como legenda de
@@ -931,83 +837,11 @@ section {
 }
 .pdi-texto p:not(.pdi-lead) { color: var(--co-body); font-size: var(--t-sm); }
 
-/* Contraste: como está / como fica. Duas colunas, mesma linha.
-   A diferença é peso e família, nunca contraste de cor rebaixado,
-   que quebraria a leitura de quem enxerga pouco. */
-.contraste { border-top: 1px solid var(--li-prata); }
-.ct-linha {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  gap: var(--s-5) var(--s-7);
-  align-items: center;
-  padding: var(--s-5) 0;
-  border-bottom: 1px solid var(--li-fina);
-}
-.ct-head { padding: var(--s-3) 0; border-bottom-color: var(--li-media); }
-.ct-lab {
-  font-family: var(--f-mono);
-  font-size: var(--t-2xs);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--co-label);
-}
-.ct-lab.ct-on { color: var(--co-silver); }
-.ct-de { color: var(--co-body); font-size: var(--t-sm); }
-.ct-pra {
-  position: relative;
-  padding-left: var(--s-5);
-  font-family: var(--f-display);
-  font-weight: 600;
-  font-size: var(--t-lg);
-  line-height: 1.24;
-  letter-spacing: -0.016em;
-}
-.ct-pra::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0.42em;
-  width: 9px;
-  height: 9px;
-  background: var(--metal);
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-}
-
 /* ===========================================================
-   11 / QUEM FAZ (apresentação)
-   Não usa .sec-head: aqui o título faz parte da apresentação,
-   não é rótulo de um bloco que vem depois. Kicker no topo,
-   título e retrato dividindo a mesma linha.
-
-   O retrato fica na coluna direita de propósito: o olhar dele
-   sai pra esquerda, então aponta de volta pro texto. Invertido,
-   olharia pra fora da página.
+   11 / RETRATO (hero)
+   Mesma peça de chapa dos cards, com chanfro, aresta prata e o
+   fio de luz da página correndo na quina de cima.
    =========================================================== */
-.apresenta {
-  display: grid;
-  grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr);
-  gap: var(--s-8) var(--s-9);
-  align-items: center;
-}
-.apresenta h2 {
-  font-size: var(--t-3xl);
-  font-weight: 700;
-  letter-spacing: -0.028em;
-  line-height: 1.0;
-  max-width: 13ch;
-  margin-bottom: var(--s-6);
-}
-.sobre-lead {
-  font-family: var(--f-display);
-  font-weight: 600;
-  font-size: var(--t-2xl);
-  line-height: 1.22;
-  letter-spacing: -0.018em;
-  margin-bottom: var(--s-5);
-}
-.apresenta-texto > p:not(.sobre-lead) { color: var(--co-body); font-size: var(--t-sm); }
-
-/* Retrato: mesma peça de chapa dos cards, com chanfro, aresta
-   prata e o fio de luz da página correndo na quina de cima. */
 .retrato {
   position: relative;
   margin: 0;
@@ -1059,68 +893,6 @@ section {
   color: var(--co-label);
 }
 .retrato figcaption i { font-style: normal; color: var(--co-silver); }
-
-.sobre-list { border-top: 1px solid var(--li-prata); margin-top: var(--s-6); }
-.sobre-item {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--s-5);
-  padding: var(--s-5) 0;
-  border-bottom: 1px solid var(--li-fina);
-}
-.sobre-item .cod {
-  font-family: var(--f-mono);
-  font-size: var(--t-xs);
-  color: var(--co-silver);
-  letter-spacing: 0.08em;
-  padding-top: 3px;
-}
-.sobre-item b {
-  display: block;
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: var(--t-md);
-  margin-bottom: var(--s-1);
-}
-.sobre-item span { color: var(--co-body); font-size: var(--t-sm); }
-
-/* ===========================================================
-   12 / FAQ
-   =========================================================== */
-.faq-list { border-top: 1px solid var(--li-prata); }
-.faq-item { border-bottom: 1px solid var(--li-fina); }
-.faq-item summary {
-  cursor: pointer;
-  list-style: none;
-  padding: var(--s-5) 0;
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: var(--t-lg);
-  letter-spacing: -0.014em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--s-5);
-  transition: color var(--dur-hover) var(--ease);
-}
-.faq-item summary:hover { color: var(--co-silver); }
-.faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary::after {
-  content: "";
-  flex-shrink: 0;
-  width: 13px;
-  height: 13px;
-  background: var(--metal);
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  transition: transform var(--dur-entra) var(--ease);
-}
-.faq-item[open] summary::after { transform: rotate(180deg); }
-.faq-item p {
-  color: var(--co-body);
-  font-size: var(--t-sm);
-  padding: 0 0 var(--s-5);
-  max-width: 72ch;
-}
 
 /* ===========================================================
    13 / CONTATO
@@ -1425,12 +1197,6 @@ section {
    =========================================================== */
 @media (max-width: 1080px) {
   .mods { grid-template-columns: repeat(2, 1fr); }
-  /* o código sai da própria coluna e passa a rotular a linha */
-  .tent {
-    grid-template-columns: 56px minmax(0, 1fr);
-    gap: var(--s-3) var(--s-5);
-  }
-  .tent p { grid-column: 2; }
 }
 
 @media (max-width: 940px) {
@@ -1450,18 +1216,15 @@ section {
   }
   .hero-col { max-width: none; }
   .hero .lead { max-width: none; }
-  /* diagrama menor pra assinatura caber logo abaixo da dobra */
-  .sistema { max-width: 340px; margin: 0 auto; }
   .hero::before {
     -webkit-mask-image: radial-gradient(90% 60% at 50% 72%, #000 0%, transparent 72%);
     mask-image: radial-gradient(90% 60% at 50% 72%, #000 0%, transparent 72%);
   }
 
   .sec-head,
-  .apresenta,
   .contato-wrap,
   .pdi-def { grid-template-columns: 1fr; gap: var(--s-5); }
-  .sec-head h2, .contato-h, .apresenta h2, .pdi-nome { max-width: none; }
+  .sec-head h2, .contato-h, .pdi-nome { max-width: none; }
   .sec-head { margin-bottom: var(--s-7); }
   .pdi-def { margin-bottom: var(--s-8); }
 
@@ -1472,20 +1235,6 @@ section {
     padding: var(--s-6) 0;
   }
   .motivo:last-child { border-bottom: 0; }
-
-  /* contraste empilhado: "hoje" vira legenda do "com posicionamento",
-     não uma segunda coluna que ninguém alinha no celular */
-  .ct-linha { grid-template-columns: 1fr; gap: var(--s-2); }
-  .ct-head { display: none; }
-  .ct-de::before {
-    content: "HOJE ";
-    font-family: var(--f-mono);
-    font-size: var(--t-3xs);
-    letter-spacing: 0.14em;
-    color: var(--co-label);
-  }
-  .ct-pra { padding-left: var(--s-5); }
-  .virada { font-size: var(--t-xl); max-width: none; }
 
   /* trilho deitado não cabe empilhado: vira vertical, à esquerda dos nós */
   .trilha { grid-template-columns: 1fr; gap: var(--s-6); }
@@ -1587,14 +1336,11 @@ section {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .sistema .link-line { animation: none; }
-  .js .sistema .cell,
   .js .reveal,
   .js .reveal-group > *,
   .js [data-hero] {
     opacity: 1 !important;
     transform: none !important;
   }
-  .sistema .pulso { display: none; }
   .progresso { display: none; }
 }

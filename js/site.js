@@ -240,49 +240,6 @@
     { opacity: 0, y: 16 },
     { opacity: 1, y: 0, duration: 0.7, ease: ease, stagger: 0.09, delay: 0.24 });
 
-  // Diagrama: o núcleo primeiro, os pontos de contato depois.
-  // A ordem conta a ideia: existe um centro, e tudo é ligado nele.
-  gsap.fromTo('.sistema .nucleo',
-    { opacity: 0, scale: 0.8 },
-    { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.6)', delay: 0.2 });
-
-  gsap.fromTo('.sistema .cell:not(.nucleo)',
-    { opacity: 0, scale: 0.84 },
-    { opacity: 1, scale: 1, duration: 0.55, ease: ease, stagger: 0.07, delay: 0.42 });
-
-  gsap.from('.sistema .wires', { opacity: 0, duration: 0.9, delay: 0.5 });
-
-  // Pulsos: o contato saindo de cada ponto e chegando no centro.
-  var pulsos = gsap.utils.toArray('.sistema .pulso').map(function (p, i) {
-    var de = p.dataset.de.split(',');
-    return gsap.timeline({ repeat: -1, repeatDelay: 0.9, delay: 1.1 + i * 0.34 })
-      .set(p, { attr: { cx: de[0], cy: de[1] }, opacity: 0 })
-      .to(p, { opacity: 1, duration: 0.28 }, 0)
-      .to(p, { attr: { cx: 200, cy: 190 }, duration: 1.5, ease: 'power1.in' }, 0)
-      .to(p, { opacity: 0, duration: 0.3 }, 1.2);
-  });
-
-  // Fora da tela não precisa animar: bateria de celular agradece.
-  ScrollTrigger.create({
-    trigger: '.hero',
-    start: 'top bottom',
-    end: 'bottom top',
-    onToggle: function (self) {
-      pulsos.forEach(function (tl) { self.isActive ? tl.play() : tl.pause(); });
-    }
-  });
-
-  // Diagrama acompanha o scroll um pouco mais devagar que o texto.
-  // Só no desktop: no celular ele já entra depois da dobra e o
-  // deslocamento só brigaria com a rolagem.
-  gsap.matchMedia().add('(min-width: 941px)', function () {
-    gsap.to('#sistema', {
-      y: -46,
-      ease: 'none',
-      scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.4 }
-    });
-  });
-
   // ---------- Títulos de seção ----------
   gsap.utils.toArray('h2.split').forEach(function (h2) {
     SplitText.create(h2, {
